@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>7 days of JavaScript</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1F6; --surface:#FFFFFF; --ink:#18203A; --muted:#5A6480; --line:#D5DBE7;
+  --indigo:#2F3A8F; --indigo-soft:#E3E6F7; --on-indigo:#FFFFFF;
+  --pass:#1F7A4D; --pass-soft:#DDF1E6; --amber:#8A5A00; --amber-soft:#FBEFD5;
+  --code-bg:#1E2542; --code-ink:#E6E9F5;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10142A; --surface:#1A2040; --ink:#E8EBF6; --muted:#A1A9C6; --line:#2C3460;
+    --indigo:#9AA5F2; --indigo-soft:#262E5C; --on-indigo:#10142A;
+    --pass:#5FD39A; --pass-soft:#173A2B; --amber:#F2C66B; --amber-soft:#3A2F14;
+    --code-bg:#0B0E1F; --code-ink:#E6E9F5;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10142A; --surface:#1A2040; --ink:#E8EBF6; --muted:#A1A9C6; --line:#2C3460;
+  --indigo:#9AA5F2; --indigo-soft:#262E5C; --on-indigo:#10142A;
+  --pass:#5FD39A; --pass-soft:#173A2B; --amber:#F2C66B; --amber-soft:#3A2F14;
+  --code-bg:#0B0E1F; --code-ink:#E6E9F5;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.75rem;line-height:1.2;margin:0 0 6px;font-weight:700;letter-spacing:-0.01em}
+.sub{color:var(--muted);margin:0 0 18px}
+
+.meter{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.meter-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pct{font-size:2.2rem;font-weight:700;line-height:1;color:var(--pass)}
+.pct small{font-size:.95rem;font-weight:500;color:var(--muted)}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+.bar i{display:block;height:100%;width:0;background:var(--pass);transition:width .35s ease}
+.meter p{margin:10px 0 0;color:var(--muted);font-size:.92rem}
+
+.tabs{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:5;margin-bottom:12px}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 2px;font:inherit;cursor:pointer;text-align:center;line-height:1.2}
+.tab b{display:block;font-size:1rem}
+.tab span{font-size:.7rem;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--indigo);border-color:var(--indigo);color:var(--on-indigo)}
+.tab[aria-selected="true"] span{color:var(--on-indigo);opacity:.85}
+.tab.full:not([aria-selected="true"]){border-color:var(--pass)}
+.tab.full:not([aria-selected="true"]) span{color:var(--pass)}
+button:focus-visible,a:focus-visible,input:focus-visible+span{outline:3px solid var(--indigo);outline-offset:2px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.day-title{font-size:1.4rem;margin:0 0 4px;line-height:1.25}
+.goal{margin:0;color:var(--muted)}
+.why{background:var(--amber-soft);color:var(--ink);border-radius:10px;padding:12px;margin-top:14px;font-size:.95rem}
+.why strong{color:var(--amber)}
+h3{font-size:1.05rem;margin:0 0 10px}
+
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.steps li:first-child{border-top:none}
+.steps li::before{content:counter(s);width:26px;height:26px;border-radius:50%;background:var(--indigo-soft);color:var(--indigo);font-weight:600;font-size:.85rem;display:grid;place-items:center}
+.steps b{font-weight:600}
+.steps em{font-style:normal;color:var(--muted);font-size:.85rem}
+
+.concept{margin:0 0 4px;padding-left:18px}
+.concept li{margin-bottom:6px}
+pre{background:var(--code-bg);color:var(--code-ink);padding:12px;border-radius:8px;overflow-x:auto;font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.55;margin:10px 0 0}
+a{color:var(--indigo)}
+
+.prob{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.prob.solved{border-color:var(--pass);background:var(--pass-soft)}
+.prob-q{margin:0;font-weight:500}
+.prob-out{margin:8px 0 0;font-size:.9rem;color:var(--muted)}
+.prob-out code{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink);font-size:.85rem}
+.prob-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 12px;font:inherit;font-size:.88rem;cursor:pointer}
+.btn.solve{border-color:var(--pass);color:var(--pass)}
+.solved .btn.solve{background:var(--pass);color:var(--on-indigo)}
+.sol{display:none}
+.sol.show{display:block}
+
+.can label{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}
+.can label:first-of-type{border-top:none}
+.can input{width:20px;height:20px;margin-top:2px;accent-color:var(--pass);flex-shrink:0}
+.hint{font-size:.88rem;color:var(--muted);margin:8px 0 0}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+.reset{margin-top:24px;background:none;border:none;color:var(--muted);font:inherit;font-size:.85rem;text-decoration:underline;cursor:pointer}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>7 days of JavaScript</h1>
+  <p class="sub">One topic a day. Understand it, type it, solve it, then check what you can now do.</p>
+
+  <section class="meter" aria-live="polite">
+    <div class="meter-row">
+      <div class="pct" id="pct">0% <small>confidence</small></div>
+      <div id="tally" style="color:var(--muted);font-size:.9rem"></div>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <p id="msg"></p>
+  </section>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="day"></div>
+  <button class="reset" id="reset">Clear all progress</button>
+</div>
+
+<script>
+const days = [
+{ t:"Variables and running code", goal:"Store values and print them.",
+  why:"In Playwright you store usernames, passwords and URLs in variables before using them in a test.",
+  read:["javascript.info: Variables","https://javascript.info/variables"],
+  concept:["console.log() prints anything to the terminal.","const stores a value that never changes. let stores a value that can change.","Main types: string (text in quotes), number, boolean (true or false).","typeof tells you the type of a value."],
+  code:`const name = "Raj";
+let tests = 5;
+tests = tests + 1;
+const isPassed = true;
+
+console.log(name, tests, isPassed); // Raj 6 true
+console.log(typeof name);           // string
+
+// Save as day1.js, then run:  node day1.js`,
+  probs:[
+   {q:"Store your name and your role in two variables. Print them in one line.", out:"Raj - QA Engineer", sol:`const name = "Raj";
+const role = "QA Engineer";
+console.log(name + " - " + role);`},
+   {q:"Store 15 and 27 in two variables and print their sum.", out:"42", sol:`const a = 15;
+const b = 27;
+console.log(a + b);`},
+   {q:"Start with let count = 10. Increase it by 5, then decrease it by 3. Print the result.", out:"12", sol:`let count = 10;
+count = count + 5;
+count = count - 3;
+console.log(count);`}
+  ],
+  can:["I can create a .js file and run it with node","I know when to use let and when to use const","I can tell a string, number and boolean apart"]},
+
+{ t:"Conditions", goal:"Make the code decide what to do.",
+  why:"Tests are full of decisions: if the page shows an error, if a status is 200, if the user is logged in.",
+  read:["javascript.info: Conditions","https://javascript.info/ifelse"],
+  concept:["if runs code only when a check is true. else runs when it is false.","else if adds more checks in between.","Use === to compare (strict equal). Use > < >= <= for numbers.","&& means both must be true. || means at least one must be true.","% gives the remainder: 7 % 2 is 1, so 7 is odd."],
+  code:`const statusCode = 404;
+
+if (statusCode === 200) {
+  console.log("Success");
+} else if (statusCode === 404) {
+  console.log("Not found");
+} else {
+  console.log("Server error");
+}
+// Not found`,
+  probs:[
+   {q:"Check if the number 7 is even or odd.", out:"7 is odd", sol:`const n = 7;
+if (n % 2 === 0) {
+  console.log(n + " is even");
+} else {
+  console.log(n + " is odd");
+}`},
+   {q:"Marks are 72. Print PASS if marks are 40 or more, otherwise FAIL.", out:"PASS", sol:`const marks = 72;
+if (marks >= 40) {
+  console.log("PASS");
+} else {
+  console.log("FAIL");
+}`},
+   {q:"username is \"admin\" and password is \"1234\". Print Login success only if both match, otherwise Invalid credentials.", out:"Login success", sol:`const username = "admin";
+const password = "1234";
+if (username === "admin" && password === "1234") {
+  console.log("Login success");
+} else {
+  console.log("Invalid credentials");
+}`}
+  ],
+  can:["I can write if, else if and else","I always compare with ===","I can combine checks with && and ||"]},
+
+{ t:"Loops", goal:"Repeat code without copying it.",
+  why:"You loop through product lists, table rows and multiple test users in automation.",
+  read:["javascript.info: Loops","https://javascript.info/while-for"],
+  concept:["for (let i = 1; i <= 5; i++) repeats with a counter i.","for...of goes through each item of a list directly.","i++ means increase i by 1.","Arrays start counting at 0, so the first item is list[0]."],
+  code:`for (let i = 1; i <= 3; i++) {
+  console.log("Step " + i);
+}
+// Step 1, Step 2, Step 3
+
+const tests = ["Login", "Search"];
+for (const name of tests) {
+  console.log("Running: " + name);
+}`,
+  probs:[
+   {q:"Print the numbers 1 to 10.", out:"1 2 3 ... 10 (each on a new line)", sol:`for (let i = 1; i <= 10; i++) {
+  console.log(i);
+}`},
+   {q:"Find the sum of all numbers from 1 to 100.", out:"5050", sol:`let sum = 0;
+for (let i = 1; i <= 100; i++) {
+  sum = sum + i;
+}
+console.log(sum);`},
+   {q:"For [\"Login\", \"Search\", \"Cart\"], print each with its number.", out:"Running test 1: Login\nRunning test 2: Search\nRunning test 3: Cart", sol:`const tests = ["Login", "Search", "Cart"];
+for (let i = 0; i < tests.length; i++) {
+  console.log("Running test " + (i + 1) + ": " + tests[i]);
+}`}
+  ],
+  can:["I can write a for loop with a counter","I can loop through a list with for...of","I understand that lists start at index 0"]},
+
+{ t:"Functions", goal:"Write reusable blocks of code.",
+  why:"Every Playwright test is a function, and you'll write helper functions like login() to reuse steps.",
+  read:["javascript.info: Functions","https://javascript.info/function-basics"],
+  concept:["A function is a named block of code you can run many times.","Parameters are inputs. return sends a result back.","Arrow function is a shorter style: const add = (a, b) => a + b;","A function does nothing until you call it: add(2, 3)."],
+  code:`function greet(name) {
+  return "Hello, " + name;
+}
+console.log(greet("Raj")); // Hello, Raj
+
+const multiply = (a, b) => a * b;
+console.log(multiply(4, 5)); // 20`,
+  probs:[
+   {q:"Write a function add(a, b) that returns the sum. Print add(4, 6).", out:"10", sol:`function add(a, b) {
+  return a + b;
+}
+console.log(add(4, 6));`},
+   {q:"Write isEven(n) that returns true or false. Print isEven(8) and isEven(5).", out:"true\nfalse", sol:`function isEven(n) {
+  return n % 2 === 0;
+}
+console.log(isEven(8));
+console.log(isEven(5));`},
+   {q:"Write an arrow function getResult(actual, expected) that returns \"PASS\" if they match, otherwise \"FAIL\".", out:"getResult(\"Home\", \"Home\") gives PASS", sol:`const getResult = (actual, expected) => {
+  if (actual === expected) return "PASS";
+  return "FAIL";
+};
+console.log(getResult("Home", "Home"));
+console.log(getResult("Home", "Cart"));`}
+  ],
+  can:["I can write a function with parameters and return","I can write the same function as an arrow function","I know a function runs only when I call it"]},
+
+{ t:"Arrays", goal:"Work with lists of values.",
+  why:"Test data, product names and results usually come as lists you need to check or filter.",
+  read:["javascript.info: Array methods","https://javascript.info/array-methods"],
+  concept:["push adds an item. length gives the count.","includes checks if an item exists.","filter keeps only the items that match a check.","map changes every item and gives a new list."],
+  code:`const scores = [30, 65, 80];
+scores.push(90);
+console.log(scores.length);          // 4
+console.log(scores.includes(65));    // true
+
+const high = scores.filter(s => s > 50);
+console.log(high);                   // [65, 80, 90]
+
+const doubled = scores.map(s => s * 2);
+console.log(doubled);                // [60, 130, 160, 180]`,
+  probs:[
+   {q:"Find the largest number in [12, 45, 7, 89, 23] using a loop.", out:"89", sol:`const nums = [12, 45, 7, 89, 23];
+let max = nums[0];
+for (const n of nums) {
+  if (n > max) max = n;
+}
+console.log(max);`},
+   {q:"From [30, 65, 80, 45, 90], keep only scores above 50.", out:"[ 65, 80, 90 ]", sol:`const scores = [30, 65, 80, 45, 90];
+const passed = scores.filter(s => s > 50);
+console.log(passed);`},
+   {q:"Count how many times \"fail\" appears in [\"pass\", \"fail\", \"pass\", \"pass\", \"fail\"].", out:"2", sol:`const results = ["pass", "fail", "pass", "pass", "fail"];
+const fails = results.filter(r => r === "fail").length;
+console.log(fails);`}
+  ],
+  can:["I can add items and count a list","I can use filter to keep matching items","I can use map to change every item"]},
+
+{ t:"Objects", goal:"Group related data together.",
+  why:"Test cases, users and API responses are objects. You'll read values from them all the time.",
+  read:["javascript.info: Objects","https://javascript.info/object"],
+  concept:["An object stores data as key: value pairs inside { }.","Read a value with a dot: user.name","A list of objects is the most common shape of test data.","Loop through the list, then read each object's keys."],
+  code:`const user = { name: "Raj", role: "QA" };
+console.log(user.name); // Raj
+
+const tests = [
+  { name: "Login",  status: "pass" },
+  { name: "Search", status: "fail" }
+];
+for (const t of tests) {
+  console.log(t.name + " is " + t.status);
+}`,
+  probs:[
+   {q:"Create a user object with name, role and experience. Print one sentence using it.", out:"Raj works as QA Engineer with 7 months experience", sol:`const user = { name: "Raj", role: "QA Engineer", experience: 7 };
+console.log(user.name + " works as " + user.role + " with " + user.experience + " months experience");`},
+   {q:"From a list of 3 test objects, print only the names of failed tests.", out:"Search", sol:`const tests = [
+  { name: "Login",  status: "pass" },
+  { name: "Search", status: "fail" },
+  { name: "Cart",   status: "pass" }
+];
+for (const t of tests) {
+  if (t.status === "fail") console.log(t.name);
+}`},
+   {q:"Using the same list, count the passed tests and print the result.", out:"Passed: 2 / 3", sol:`const passed = tests.filter(t => t.status === "pass").length;
+console.log("Passed: " + passed + " / " + tests.length);`}
+  ],
+  can:["I can create an object and read its values","I can loop through a list of objects","I can filter a list of objects by a key"]},
+
+{ t:"async/await and final check", goal:"Understand waiting, then combine everything.",
+  why:"Every Playwright line starts with await, because the browser takes time to load and respond.",
+  read:["javascript.info: async/await","https://javascript.info/async-await"],
+  concept:["Some work takes time, like loading a page. JavaScript doesn't wait by default.","A Promise is a value that arrives later.","await pauses until that value arrives. It works only inside an async function.","Today's last problem uses everything from Days 1 to 6."],
+  code:`const wait = ms => new Promise(r => setTimeout(r, ms));
+
+async function run() {
+  console.log("Opening page");
+  await wait(1000);
+  console.log("Page loaded");
+}
+run();`,
+  probs:[
+   {q:"Write an async function that prints Open page, waits 1 second, prints Login, waits 1 second, prints Logout.", out:"Open page\nLogin\nLogout (with a pause between each)", sol:`const wait = ms => new Promise(r => setTimeout(r, ms));
+
+async function runSteps() {
+  console.log("Open page");
+  await wait(1000);
+  console.log("Login");
+  await wait(1000);
+  console.log("Logout");
+}
+runSteps();`},
+   {q:"Write async fakeLogin(user) that returns \"Welcome, \" + user after 1 second. Await it and print the result.", out:"Welcome, Raj", sol:`const wait = ms => new Promise(r => setTimeout(r, ms));
+
+async function fakeLogin(user) {
+  await wait(1000);
+  return "Welcome, " + user;
+}
+
+async function main() {
+  const msg = await fakeLogin("Raj");
+  console.log(msg);
+}
+main();`},
+   {q:"Final check: write report(tests) that prints total, passed, failed, and the failed test names. Use a list of 5 test objects.", out:"Total: 5\nPassed: 3\nFailed: 2\nFailed tests: Search, Payment", sol:`function report(tests) {
+  const passed = tests.filter(t => t.status === "pass");
+  const failed = tests.filter(t => t.status === "fail");
+  console.log("Total: " + tests.length);
+  console.log("Passed: " + passed.length);
+  console.log("Failed: " + failed.length);
+  console.log("Failed tests: " + failed.map(t => t.name).join(", "));
+}
+
+report([
+  { name: "Login",   status: "pass" },
+  { name: "Search",  status: "fail" },
+  { name: "Cart",    status: "pass" },
+  { name: "Payment", status: "fail" },
+  { name: "Logout",  status: "pass" }
+]);`}
+  ],
+  can:["I can explain why await is needed","I can write an async function that uses await","I solved the final check program by myself"]}
+];
+
+const steps = [
+ ["Recall","Write yesterday's example from memory, without looking.","10 min"],
+ ["Understand","Read the concept below and the linked page. Nothing else.","30 min"],
+ ["Type and play","Type the example yourself. Change values and predict the output before running.","45 min"],
+ ["Solve","Do the 3 problems. Stuck for 15 minutes? Peek at the solution, then retype it from memory.","45 min"],
+ ["Check yourself","Tick only the statements you can honestly do.","5 min"]
+];
+
+const KEY = "js7-progress";
+let st = { solved:{}, can:{}, day:0 };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) st = Object.assign(st, s); } catch(e){}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} };
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+const TOTAL = days.length * 6; // 3 problems + 3 checks per day
+function dayScore(i){ let n=0; for(let k=0;k<3;k++){ if(st.solved[i+"-"+k]) n++; if(st.can[i+"-"+k]) n++; } return n; }
+
+function renderTabs(){
+  const el = document.getElementById("tabs");
+  el.innerHTML = days.map((d,i)=>{
+    const s = dayScore(i);
+    return `<button class="tab ${s===6?"full":""}" role="tab" aria-selected="${i===st.day}" data-i="${i}" aria-label="Day ${i+1}"><b>${i+1}</b><span>${s===6?"Done":"Day"}</span></button>`;
+  }).join("");
+  el.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{ st.day=+b.dataset.i; save(); render(); window.scrollTo({top:0}); });
+}
+
+function renderDay(){
+  const i = st.day, d = days[i];
+  const el = document.getElementById("day");
+  el.innerHTML = `
+  <section class="card">
+    <h2 class="day-title">Day ${i+1}: ${d.t}</h2>
+    <p class="goal">${d.goal}</p>
+    <div class="why"><strong>Why it matters:</strong> ${d.why}</div>
+  </section>
+
+  <section class="card">
+    <h3>Today's routine</h3>
+    <ol class="steps">${steps.map(s=>`<li><div><b>${s[0]}</b> <em>${s[2]}</em><br>${s[1]}</div></li>`).join("")}</ol>
+  </section>
+
+  <section class="card">
+    <h3>The concept</h3>
+    <ul class="concept">${d.concept.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+    <pre><code>${esc(d.code)}</code></pre>
+    <p class="hint">Read more: <a href="${d.read[1]}" target="_blank" rel="noopener">${d.read[0]}</a></p>
+  </section>
+
+  <section class="card">
+    <h3>Solve these 3</h3>
+    ${d.probs.map((p,k)=>{
+      const id=i+"-"+k, ok=!!st.solved[id];
+      return `<div class="prob ${ok?"solved":""}">
+        <p class="prob-q">${k+1}. ${esc(p.q)}</p>
+        <p class="prob-out">Expected output:<br><code>${esc(p.out).replace(/\n/g,"<br>")}</code></p>
+        <div class="prob-actions">
+          <button class="btn solve" data-id="${id}">${ok?"Solved":"Mark solved"}</button>
+          <button class="btn show" data-k="${k}" aria-expanded="false">Show solution</button>
+        </div>
+        <pre class="sol" id="sol-${k}"><code>${esc(p.sol)}</code></pre>
+      </div>`;
+    }).join("")}
+    <p class="hint">Want more practice? Paste today's topic into your practice prompt.</p>
+  </section>
+
+  <section class="card can">
+    <h3>What I can do now</h3>
+    ${d.can.map((c,k)=>{ const id=i+"-"+k; return `<label><input type="checkbox" data-id="${id}" ${st.can[id]?"checked":""}><span>${esc(c)}</span></label>`; }).join("")}
+  </section>
+
+  <div class="nav">
+    ${i>0?`<button class="btn" id="prev">Day ${i}</button>`:"<span></span>"}
+    ${i<days.length-1?`<button class="btn" id="next">Day ${i+2}</button>`:""}
+  </div>`;
+
+  el.querySelectorAll(".btn.solve").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id; if(st.solved[id]) delete st.solved[id]; else st.solved[id]=true; save();
+    const box=b.closest(".prob"); box.classList.toggle("solved", !!st.solved[id]); b.textContent = st.solved[id]?"Solved":"Mark solved";
+    renderTabs(); renderMeter();
+  });
+  el.querySelectorAll(".btn.show").forEach(b=>b.onclick=()=>{
+    const s=document.getElementById("sol-"+b.dataset.k); const open=s.classList.toggle("show");
+    b.textContent = open?"Hide solution":"Show solution"; b.setAttribute("aria-expanded", open);
+  });
+  el.querySelectorAll(".can input").forEach(c=>c.onchange=()=>{
+    if(c.checked) st.can[c.dataset.id]=true; else delete st.can[c.dataset.id]; save(); renderTabs(); renderMeter();
+  });
+  const p=document.getElementById("prev"), n=document.getElementById("next");
+  if(p) p.onclick=()=>{ st.day--; save(); render(); window.scrollTo({top:0}); };
+  if(n) n.onclick=()=>{ st.day++; save(); render(); window.scrollTo({top:0}); };
+}
+
+function renderMeter(){
+  let n=0; for(let i=0;i<days.length;i++) n+=dayScore(i);
+  const pct = Math.round(n/TOTAL*100);
+  document.getElementById("pct").innerHTML = `${pct}% <small>confidence</small>`;
+  document.getElementById("bar").style.width = pct+"%";
+  const solved = Object.keys(st.solved).length;
+  document.getElementById("tally").textContent = `${solved} of 21 problems solved`;
+  document.getElementById("msg").textContent =
+    pct===0 ? "Start with Day 1. Solve a problem or tick a statement to raise your confidence."
+    : pct<40 ? "Good start. One topic a day, at the same time."
+    : pct<80 ? "You're building real understanding. Keep going."
+    : pct<100 ? "Almost there. Finish the final check on Day 7."
+    : "All 7 days complete. You understand the JavaScript basics needed for Playwright.";
+}
+
+function render(){ renderTabs(); renderDay(); renderMeter(); }
+document.getElementById("reset").onclick=()=>{ if(confirm("Clear all progress?")){ st={solved:{},can:{},day:0}; save(); render(); } };
+render();
+</script>
+</body>
+</html>
